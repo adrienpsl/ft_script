@@ -28,6 +28,9 @@ log
 pass`
 l'ordinateur a remplacer l'humain qui tape les reponses.
 
+
+https://openclassrooms.com/fr/courses/1513891-la-programmation-systeme-en-c-sous-unix/1514339-les-processus
+
 ### tout le temps
 Mais on ne peux pas faire ca tout le temps:
 - car certain programme interactif on des shema plus complex
@@ -52,6 +55,39 @@ je peux faire sur cet esclave des echo, carriage return et
 des line feed.
 Il y en a plusieur, mais nous on va juste prendre la sysV
 
+la mise en oeuvre des terminaux se fait avec une simple api
+
+### the function
+- posix_openpt :
+    it call /dev/ptmx to get the master fd of the pty, with open /dev/ptmx
+    It seam on osx, this do not exist, and I need to loop on tty like in this post
+    (https://stackoverflow.com/questions/43956208/does-mac-os-x-have-the-dev-ptmx-file/43956337)
+    in the man of that func, there is a version with only syscall :
+    (http://man7.org/linux/man-pages/man3/posix_openpt.3.html)
+- grantpt
+    apres l'open, on utilise pour changer les droits d'acces
+    sur la partie esclave du pt.
+    userid = userid parent, group = random
+    right = crw--w----
+- unlockpt 
+    on lui pas le descripteur pour unlock le p esclave
+- ftsname
+    me donne le nom de mon esclave
+    je peux l'ouvrir avec open
+    
+
+
+
+
+# I'm fucked, I didn't understand all that shit, so I restart by the start
+## what is tty 
+(first link)[https://www.howtoforge.com/linux-tty-command/]
+In linux everything is a file, even the hardware device, that are special file
+`tty [option]` print the current tty of the current terminal
+
+
+
+what is pty
 
 
 
