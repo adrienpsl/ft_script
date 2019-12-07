@@ -93,14 +93,13 @@ what is pty
 
 
 
+que va t il se passer demain?
+je lui demande pourquoi il m'a dit oui, car c'est pas conventionnel
 
+ ce que je peux faire, la logistique, l'organisation...
+ca va leurs donne de la souplesse et de la flexibilite, 
 
-
-
-
-
-
-
+je veux faire du shadowing. Pour bien conprendre ce que vous dite.
 
 
 
