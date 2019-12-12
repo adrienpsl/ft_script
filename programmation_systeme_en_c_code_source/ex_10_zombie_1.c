@@ -1,42 +1,21 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: adpusel <adpusel@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/10/19 10:48:07 by adpusel           #+#    #+#             */
-/*   Updated: 2017/11/16 12:45:50 by adpusel          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include<stdio.h>
+#include<unistd.h>
+#include<sys/wait.h>
+#include<sys/types.h>
 
-#include <stdio.h>
-# include "stdlib.h"
-# include "unistd.h"
-
-int main(void)
+int main()
 {
-	pid_t pid;
-	char command[128];
-
-	if((pid = fork()) < 0)
-	{
-		printf("Echec fork() \n");
-		exit(1);
-	}
+	int i;
+	int pid = fork();
 
 	if (pid == 0)
 	{
-		// pid == 0, because it's the fils (bitch)
-	    sleep(2);
-	    printf("le process fils %u se termine \n", getpid());
-	    exit(0);
+		for (i=0; i<20; i++)
+			printf("I am Child\n");
 	}
 	else
 	{
-		// process pere:
-		sprintf(command, "ps %u", pid);
-
+		printf("I am Parent\n");
+		while(1);
 	}
-
 }
