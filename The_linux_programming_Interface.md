@@ -325,6 +325,183 @@ ils sont separer par IFS en bash
 -- indique la fin des options, tout le reste apres sera pas une option
 '-' est transmit comme un argument, et stop la prise d'option
 
+## Execution des programme
+how que c'est comment que on lance un process mec ?
+
+### Lancer un nouveau programme
+
+#### exec
+if exec reussit, il ne revient pas, sinon, il retourn -1 et errno 
+log l'error. 
+
+Il n'existe qu'un seul execve() est le seul syscall, les autres
+sont des variation de celui ci, sur comment on passe les datas.
+
+!! pour le path il est smart de mettre en premier les 
+directory les plus utiliser.
+
+!! $SHLVL contient le nombre de shell imbriquer.
+a chaque execve il y en a un nouveau.
+
+nous allons reproduire ca :
+```bash
+sh -c "echo $SHLVL"
+```
+l'option -c ask shell, do that and quit.
+**ex_04**
+
+les autres fonctions fonctionne de la meme maniere,
+avec des differences d'argument.
+
+#### la copie.
+Quand un call a execve est fait, et qu'il reussi: 
+le nouveau programme replace totalement l'ancien: 
+    - les segments, les variables, le pile, tout est liberer
+    - les chaines d'environemnet et d'argument sont copier,
+        on peut utiliser n'importe quel genre de variable 
+        pour transmettre les arguments de exec().
+l'ancien programme transmet au new :
+- les PID, PPID, PGID, SID, **il n'y a pas de new process**
+- les UID et GID, sauf si set-UID/GID est active,
+    dans ce cas la, seuls les reel sont conserver, les effectifs
+    sont mis a jour.
+- le masque des signaux est bloque, et les signaux en attente
+- autre chose avec les signaux, chapitre 7.
+- les discripteurs de fichiers ouverts ainsi que leurs 
+    eventuel verrous. sauf si le file a l'attribut: close-on-exec.
+**par contre :**
+- les temps d'execution associer au process continue
+- les privileges restent les memes.
+
+#### les erreurs
+l'appel de exve ne reviens pas, donc s'il revient, il y a une erreur:
+- le fichier n'existe pas, n'est pas executable,
+   le process appelant n'as pas le bon right. 
+- le fichier est trop gros, plus de memoir, pb d'ouverture fichier
+    c'est des err critic, on quit program
+- ptr in valide
+- fichier deja ouvert
+- l'error : ETXTBSY, voir la suite, le fichier est deja ouvert en ecriture.
+
+##### petite formation sur les pages
+linux donne des pages (hehe malloc mon gars)
+en realiter, il y un mappage fait par le processeur entre la memoire physique
+et les pages donne. elle peuvent bouger de place, etre mis sur le disque dur
+si plus de place...Mais la page peut deja etre sur le disque.
+auquel cas, il y a une faute de page, et le kernel la reload.
+le noyau garde trace de toute les pages modifier, car si elle sont sur le disque
+et la ram, et plus de place, il delete les pages sur les deux. 
+c'est malin ce truc !
+La force de ce prosses c'est que tout n'a pas besoin d'etre en memoire, le noyau
+charge et decharge au fur et a mesure.
+Mais, il faut securiser les fichiers ou sont les data, ceux du disque, 
+car s'il change et que les data ne sont plus en memoire bha ca ne marche plus.
+c'est pour ca que on ne peux pas modifier un fichier en cours d'execution.
+le kernel l'a lock.
+
+c'est pour ca que je ne peux pas recomplier un programme ouvert. c'est bloquer bitch
+
+#### fonction simplifier pour executer un sous-programme
+on veut parfois lancer une commande extren sans remplacer le process en cours.
+on utilse la command system() pour faire ca. Cette fonction invoque le shell
+et lui transmet la command fourni, et reviens a la fin de l'execution.
+voir ex_06_system, pour avoir une interpretation simplifier
+
+! la command system represente une tres grosse fail de securite, 
+si le program qui la lance est en set-UID root, il poura faire ce qu'il veut:
+la command search dans PATH les binaire, si je cherche ls et que le pirate 
+a remplacer ls, il lancera sont programme en root, et c'est la merde.
+le danger avec system, c'est qu'il appelle un shell au lieu de lancer la command.
+system est une commande super, mais il ne faut pas l'utiliser avec tout !
+
+ouvrir un nouveau process en lui donnant des inputs:
+- popen (const char *command, const char *mode);
+    - elle ouvrira un fork ou un excev
+    - en fonction du mode, le flux d'entree ou de sortie du programme est utilise
+    - il faut toujours la refermer avec pclose(), qui attend la fin du process
+        et retour son retour. 
+    - voir ex_06
+    - cette routine, fait comme system, un execl, elle cherche dans PATH
+- la second utilite de popen est recuper des donne difficile a optenir 
+    et de les parcer (who, ps, netstat...)
+    - voir ex_08
+
+## Fin du program
+
+### assert
+Pour check en direct ce que fais un processus, on utilise le define assert
+qui va si l'assertion est fausse quitter le program et ecrire des data de 
+debug.
+
+assert permet de documente les element d'une routine qui ne doivent pas etre 
+d'une certaine valeur, il faut le voir comme un super commentaire.
+
+assert(ptr != NULL)
+c'est comme // ptr nedd != NULL
+
+ces commentaire ne seront surment pas vu en cas de changement du code,
+alors que le assert etant compiler, le sera et raisera une error
+
+il est possible d'activer NDEBUG avec define et de le desactiver avec #undef
+pour activer ou desactiver le debug dans certain portion.
+
+il faut ensuite inclure un flag -DNDEBUG  ou define #NDEBUG pour basculer 
+entre dev et production.
+
+notons que assert utilise la routine abort()
+
+
+### Routine de terminaison
+Il est possbible avec les fonction atexit() et on_exit(), 
+de faire enregistrer des fonctions qui seront ex quand le P terminera normalement
+
+elles peuvents servire a:
+- effacer des fichiers temporaire / save le setup de l'user
+- save sur disque un sturct du programme
+- libere des verro sur les fichiers ou hoses de donnees
+- restauren l'etat initial du terminal
+- terminer un dialog resaut proprement en suivant un protocol complets
+
+On peut le faire dans P mais:
+- on peut quitter de ou on veut
+- c'est sur qu'il n'y aurra pas d'oublie
+
+int atexit (void *routine(void));
+- elle recoit un ptr sur une void *routine(void) et le save, pour le call plus tard
+- les fonctions sont pop comme un array, un f mise *2 le sera 2
+- il n'y a pas de facon de deprogrammer un f add, add global inside to control
+- exit() ne fais rien dedans
+- _exit() exit without call other function 
+
+### attendre la fin d'un processus fils
+linux est base sur un grand nombre de function mise ensemble, 
+il est donc primordial, de pouvoir get leur retour pour pouvoir les 
+get les erreur. a tel point, que tant que le retour d'un process 
+n'est pas fait, il passe en mode zombie et attend indefiniment d'etre lu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
