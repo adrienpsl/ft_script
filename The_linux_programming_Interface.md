@@ -479,6 +479,69 @@ il est donc primordial, de pouvoir get leur retour pour pouvoir les
 get les erreur. a tel point, que tant que le retour d'un process 
 n'est pas fait, il passe en mode zombie et attend indefiniment d'etre lu
 
+il est tres important de mettre un wait dans le code du pere, ou de 
+handle correctement les signaux, sinon le fils a la fin devient un zombie.
+car quand un programme termine, son return est stocker dans le registre des programme
+et ca prend une place ! Et c'est pas bien du tout !
+
+si le pere termine avant le fils, init: le process 1, devient le pere du fils
+
+### lire le retour d'un process:
+Il existe 4 function pour avoir le retour d'un process: wait, waitpid, wait3, wait4
+seul wait4 est un syscall.
+
+#### wait
+pid_t wait(int *status);
+elle bloque le process appelant jusqu'a ce que l'un de ses fils se termine.
+Elle return ensuite l'id du fils terminer. si le satus est non null, 
+il contiendra le return du fils.
+Le retour est opaque et il faut utiliser des masques pour connaitre les valeurs
+de retour.
+WFEXITED(status): le process s'est terminer avec exit() ou main, 
+WEXITSTATUS(status): le return du program
+
+WFSIGNALED(status): terminer a cause d'un signal (y compris le GABRT de abort())
+WTERMSI(s): le signal qui a tuer le process
+WCOREDUMP(s): signal si un core dump a ete creer  
+
+WFSTOPPED(S): indique que le fils est stope
+WSTOPSIG(S): le sig qui a stop le fils
+
+la F wait() peut echouer si pas de fils, et return -1 en placant l'err ECHILD
+dans errno.
+
+Mais il y a deux pb: 
+    - l'appel et bloquant, je ne peux rien faire dans le pere tant que l'un des fils
+        n'a pas fini (une loop qui lance des routines tant que wait n'est pas fini)
+    - je ne peux pas choisir quel fils j'attend avec wait, je peux faire des trics
+        avec SIGCHLD mais ce n'est pas optimun
+
+pour pallier a ces deux pb 
+#### waitpid
+pid_t waitpid(pid_t pid, int *status, int options);
+Le premier argument permet de determiner le fils que l'on attend:
+    - si strictement positif -> attendre la fin du process == a ce pid
+    - 0 : attendre le premier fils appartenant au meme group qui fini // WAIT_MYPGRG
+    - -1:  atterdre la fin de n'importequel processus
+    - < -1: attendre la fin de n'importequel processus qui appartient au grop du process 
+        dont le num est -pid
+status == wait(status)
+options : binary, | 
+    - WNOHANG : ne pas rester bloquer aucun process == pid n'est terminer, return 0
+    - WENTRACED: acceder au informations concernant les processus fils stop 
+
+#### wait3
+Permet d'obtenir des informations suplementaire sur le process qui s'est terminer.
+ces informations sont transisent par une struct : rusage (page 106, tout est detaille)
+linux ne remplie pas tout, c'est plus utiliser pour dev des truc de ouf : 
+    - time
+    - faute de pages
+    - les swaps
+ 
+
+
+
+
 
 
 
