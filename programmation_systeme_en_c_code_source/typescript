@@ -1,0 +1,36 @@
+Script started on Fri Dec 13 13:47:44 2019
+[1m[7m%[27m[1m[0m                                                                                                                              [0m[27m[24m[Je3r6p20% [K[?2004httoto[?2004l
+zsh: command not found: toto
+[1m[7m%[27m[1m[0m                                                                                                                              [0m[27m[24m[Je3r6p20% [K[?2004httiti  t  lls totols  [1C[1C[1C[1C[1C[1Ctotols  [?2004l
+a.out			ex_04_execve.c		ex_08_popen_2.c		ex_12_wait_2.c		typescript
+ex_01_fork.c		ex_05_execv_block.c	ex_09_on_exit.c		ex_13_wait_3.c
+ex_02_getuid.c		ex_06_system.c		ex_10_zombie_1.c	ex_14_perror.c
+ex_03_setuid.c		ex_07_popen_1.c		ex_11_wait_1.c		script_popen_3.sh
+[1m[7m%[27m[1m[0m                                                                                                                              [0m[27m[24m[Je3r6p20% [K[?2004hlls 3 1 -la[?2004l
+total 152
+drwxr-xr-x  19 adpusel  2017_paris   646 Dec 13 13:47 .
+drwxr-xr-x  17 adpusel  2017_paris   578 Dec 13 13:39 ..
+-rwxr-xr-x   1 adpusel  2017_paris  8712 Dec 13 12:17 a.out
+-rw-r--r--   1 adpusel  2017_paris  1588 Dec 12 12:57 ex_01_fork.c
+-rw-r--r--   1 adpusel  2017_paris  1045 Dec 12 12:57 ex_02_getuid.c
+-rw-r--r--   1 adpusel  2017_paris  1412 Dec 12 12:57 ex_03_setuid.c
+-rw-r--r--   1 adpusel  2017_paris  1191 Dec 12 12:57 ex_04_execve.c
+-rw-r--r--   1 adpusel  2017_paris  1776 Dec 12 12:57 ex_05_execv_block.c
+-rw-r--r--   1 adpusel  2017_paris  1233 Dec 12 12:57 ex_06_system.c
+-rw-r--r--   1 adpusel  2017_paris  1464 Dec 12 12:57 ex_07_popen_1.c
+-rw-r--r--   1 adpusel  2017_paris  1423 Dec 12 12:57 ex_08_popen_2.c
+-rw-r--r--   1 adpusel  2017_paris  1498 Dec 12 12:57 ex_09_on_exit.c
+-rw-r--r--   1 adpusel  2017_paris   245 Dec 12 17:35 ex_10_zombie_1.c
+-rw-r--r--   1 adpusel  2017_paris  2223 Dec 13 10:17 ex_11_wait_1.c
+-rw-r--r--   1 adpusel  2017_paris  1522 Dec 13 10:17 ex_12_wait_2.c
+-rw-r--r--   1 adpusel  2017_paris  1299 Dec 13 11:34 ex_13_wait_3.c
+-rw-r--r--   1 adpusel  2017_paris  1561 Dec 13 12:17 ex_14_perror.c
+-rw-r--r--   1 adpusel  2017_paris   673 Dec 12 12:57 script_popen_3.sh
+-rw-r--r--   1 adpusel  2017_paris    43 Dec 13 13:47 typescript
+[1m[7m%[27m[1m[0m                                                                                                                              [0m[27m[24m[Je3r6p20% [K[?2004httty[?2004l
+/dev/ttys001
+[1m[7m%[27m[1m[0m                                                                                                                              [0m[27m[24m[Je3r6p20% [K[?2004h...[?2004l
+zsh: permission denied: ..
+[1m[7m%[27m[1m[0m                                                                                                                              [0m[27m[24m[Je3r6p20% [K[?2004heexit[?2004l
+
+Script done on Fri Dec 13 13:48:07 2019

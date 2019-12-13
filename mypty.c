@@ -12,7 +12,7 @@ int main(void)
 	int rc;
 
 	// Affichage de /dev/pts
-	system("ls -l /dev/ttys*");
+//	system("ls -l /dev/ttys*");
 
 	if ((open("/dev/ptmx", O_RDWR | O_NOCTTY)) < 0)
 		printf("no ptmx");
@@ -41,7 +41,7 @@ int main(void)
 	}
 
 	// Affichage des changements dans /dev/pts
-	system("ls -l /dev/ptmx");
+//	system("ls -l /dev/ptmx");
 
 	printf("Le pseudo-terminal esclave a pour nom : %s\n", ptsname(fdm));
 	return 0;
