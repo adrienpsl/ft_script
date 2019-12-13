@@ -537,12 +537,63 @@ linux ne remplie pas tout, c'est plus utiliser pour dev des truc de ouf :
     - time
     - faute de pages
     - les swaps
- 
+pid_t wait3(int *status, int options, struct rusage *rusage);
+options | status = waitpid's stuff
 
 
+#### wait4
+la meilleur F et la seule qui est un syscall: 
+pid_t wait4(pid_t pid, int *status, int options, struct rusage *rusage);
+- elle permet d'obtenir des stats (wait3) et d'attendre (wait4);
+wait3(status, options, usage) >> wait4(-1, status, options, usage);
+waitpid(pid, status, options) >> wait4(pid, status, options, NULL);
+wait(status)                  >> wait(-1, status, 0, NULL);
+page 114;
+
+depuis linux 2.6, il y a waitid, qui permet d'attendre qu'un process restart
+after un arret.
+
+### Les erreurs
+errno.h, est toujours replie avec un value > 0,
+il est impossible de gere toute les erreurs, mais il ne faut jamais les hide,
+il faut les classer, et mettre les grave dans assert()
+certain error came from the system, and so I can't do stuff apart,
+prevent the user, and quit.
+utiliser strerror, c'est bien pour catch les errors possible,
+faire un
+char *strerror(int error_number); qui retrounera le code de l'error
+char *strerror_r(int err, char *s, size_t i); pour du multithread
+
+dans tout les cas, il faut regarde le man de cette fonction(esperant qu'il est a jour)
+et de se proteger contre les errors les plus commune.
+
+#### sys_errlist
+const char * sys_errlist[]; > all error
+int sys_nerr; > size sis_errlist
+il y a des trous dans cet array, il faut bien se proteger en prennant dedans 
+comme avec : 
+`
+if ((erreur < 0) || (erreur >= sys_nerr)) { 
+    fprintf(stderr, "Erreur invalide %d\n", erreur);
+} else if (sys_errlist[erreur] == NULL) {
+    fprintf(stderr, "Erreur non documentée %d\n", erreur);
+} else {
+    fprintf(stderr, "%s\n", sys_errlist[erreur]);
+}
+`
+
+### Conclusion
+un process peut  se terminer a cause:
+    - de cause normal(exit, end main), 
+    - irremediable(seg, abort, signal), 
+    - moins grave, no file, no memory...
+il faut toujours anticiper, ou mn log les erreurs
 
 
-
+## Les signaux
+C'est pour l'auteur le truc le plus fun avec linux, et il y en a 2 types:
+    - classic : norme Ansi C
+    - plus mieux : def par SUSv3 
 
 
 
